@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.happy.service.main.dao.UserMapper">
+  <resultMap id="BaseResultMap" type="com.happy.service.main.po.User">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="realname" jdbcType="VARCHAR" property="realname" />
+    <result column="nickname" jdbcType="VARCHAR" property="nickname" />
+    <result column="mobile" jdbcType="VARCHAR" property="mobile" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="state" jdbcType="INTEGER" property="state" />
+    <result column="create_user_id" jdbcType="BIGINT" property="createUserId" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="last_update_user_id" jdbcType="BIGINT" property="lastUpdateUserId" />
+    <result column="last_update_time" jdbcType="TIMESTAMP" property="lastUpdateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, realname, nickname, mobile, password, type, state, create_user_id, create_time, 
+    last_update_user_id, last_update_time
+  </sql>
+  
+   <insert id="insertUser" >
+    <selectKey keyProperty="user.id" resultType="java.lang.Long" order="BEFORE">
+            select uuid_short()
+    </selectKey>
+    insert into user (<include refid="Base_Column_List" />)
+    values (
+    #{user.id,jdbcType=BIGINT}, 
+    #{user.realname,jdbcType=VARCHAR}, 
+    #{user.nickname,jdbcType=VARCHAR}, 
+    #{user.mobile,jdbcType=VARCHAR}, 
+    #{user.password,jdbcType=VARCHAR}, 
+    #{user.type,jdbcType=INTEGER}, 
+    #{user.state,jdbcType=INTEGER}, 
+    #{user.createUserId,jdbcType=BIGINT}, 
+    now(), 
+    #{user.lastUpdateUserId,jdbcType=BIGINT}, 
+    now()
+    )
+  </insert>
+  
+   <update id="updateUser">
+    update user
+    <set>
+      <if test="user.realname != null">
+        realname = #{user.realname,jdbcType=VARCHAR},
+      </if>
+      <if test="user.nickname != null">
+        nickname = #{user.nickname,jdbcType=VARCHAR},
+      </if>
+      <if test="user.mobile != null">
+        mobile = #{user.mobile,jdbcType=VARCHAR},
+      </if>
+      <if test="user.password != null">
+        password = #{user.password,jdbcType=VARCHAR},
+      </if>
+      <if test="user.type != null">
+        type = #{user.type,jdbcType=INTEGER},
+      </if>
+      <if test="user.state != null">
+        state = #{user.state,jdbcType=INTEGER},
+      </if>
+      <if test="user.createUserId != null">
+        create_user_id = #{user.createUserId,jdbcType=BIGINT},
+      </if>
+      <if test="user.createTime != null">
+        create_time = #{user.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="user.lastUpdateUserId != null">
+        last_update_user_id = #{user.lastUpdateUserId,jdbcType=BIGINT},
+      </if>
+      <if test="user.lastUpdateTime != null">
+        last_update_time = #{user.lastUpdateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  
+  <select id="listUser" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from user
+     <where>
+       <if test="query.name != null and query.name != ''" >
+        and (
+        realname like concat('%',#{query.name},'%') 
+        or 
+        nickname like concat('%',#{query.name},'%')
+        )</if>
+       <if test="query.mobile != null and query.mobile != ''" > and mobile=#{query.mobile }</if>
+       <if test="query.type != null" > and type=#{query.type}</if>
+       <if test="query.state != null" > and state=#{query.state }</if>
+    </where>
+  </select>
+  <update id="startUser">
+    update user
+    set 
+      state = 0,
+      last_update_user_id = #{opUserId,jdbcType=BIGINT},
+      last_update_time = now()
+    where id = #{userId,jdbcType=BIGINT}
+  </update>
+  <update id="stopUser">
+    update user
+    set 
+      state = 1,
+      last_update_user_id = #{opUserId,jdbcType=BIGINT},
+      last_update_time = now()
+    where id = #{userId,jdbcType=BIGINT}
+  </update>
+   <select id="getUserById" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from user
+     where id=#{id}
+  </select>
+  
+   <select id="getUserByLogin"  resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from user
+     where mobile=#{account} and password=#{password} 
+     <if test="type!=null">and type=#{type}</if>
+  </select>
+  <select id="getKeeperByMobile"  resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from user
+     where mobile=#{mobile}  and type=1
+  </select>
+</mapper>

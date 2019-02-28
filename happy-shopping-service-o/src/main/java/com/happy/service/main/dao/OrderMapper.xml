@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.happy.service.main.dao.OrderMapper">
+  <resultMap id="BaseResultMap" type="com.happy.service.main.po.Order">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="state" jdbcType="INTEGER" property="state" />
+    <result column="amount" jdbcType="REAL" property="amount" />
+    <result column="user_id" jdbcType="BIGINT" property="userId" />
+    <result column="user_address_id" jdbcType="BIGINT" property="userAddressId" />
+    <result column="user_shopping_cart_id" jdbcType="BIGINT" property="userShoppingCartId" />
+    <result column="create_user_id" jdbcType="BIGINT" property="createUserId" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="last_update_user_id" jdbcType="BIGINT" property="lastUpdateUserId" />
+    <result column="last_update_time" jdbcType="TIMESTAMP" property="lastUpdateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, state, amount, user_id, user_address_id, user_shopping_cart_id, create_user_id, 
+    create_time, last_update_user_id, last_update_time
+  </sql>
+
+  <insert id="insertOrder">
+    <selectKey keyProperty="order.id" resultType="java.lang.Long" order="BEFORE">
+            select uuid_short()
+    </selectKey>
+    insert into order ( <include refid="Base_Column_List" />)
+    values (
+    #{order.id,jdbcType=BIGINT}, 
+    #{order.state,jdbcType=INTEGER}, 
+    #{order.amount,jdbcType=REAL}, 
+    #{order.userId,jdbcType=BIGINT}, 
+    #{order.userAddressId,jdbcType=BIGINT}, 
+    #{order.userShoppingCartId,jdbcType=BIGINT}, 
+    #{order.createUserId,jdbcType=BIGINT}, 
+    now(), 
+    #{order.lastUpdateUserId,jdbcType=BIGINT}, 
+    now())
+  </insert>
+  
+  <update id="payForOrder">
+    update order
+    set state=1
+    where id = #{orderId,jdbcType=BIGINT}
+  </update>
+  
+  <update id="dropOrder">
+    update order
+    set state=1
+    where id = #{orderId,jdbcType=BIGINT}
+  </update>
+  
+  <select id="listOrder" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from order
+    <where>
+       <if test="query.id != null and query.id != ''" > and id=#{query.id }</if>
+       <if test="query.state != null and query.state != ''" > and state=#{query.state }</if>
+    </where>
+  </select>
+ 
+</mapper>

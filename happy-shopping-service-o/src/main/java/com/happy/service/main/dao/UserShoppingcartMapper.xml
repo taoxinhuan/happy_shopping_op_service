@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.happy.service.main.dao.UserShoppingcartMapper">
+  <resultMap id="BaseResultMap" type="com.happy.service.main.po.UserShoppingcart">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="user_id" jdbcType="BIGINT" property="userId" />
+    <result column="product_id" jdbcType="BIGINT" property="productId" />
+    <result column="product_sku_id" jdbcType="BIGINT" property="productSkuId" />
+    <result column="count" jdbcType="INTEGER" property="count" />
+    <result column="create_user_id" jdbcType="BIGINT" property="createUserId" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="last_update_user__id" jdbcType="BIGINT" property="lastUpdateUserId" />
+    <result column="last_update_time" jdbcType="TIMESTAMP" property="lastUpdateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, user_id, product_id, product_sku_id, count, create_user_id, create_time, last_update_user__id, 
+    last_update_time
+  </sql>
+  <delete id="deleteShoppingcart" parameterType="java.lang.Long">
+    delete from user_shopping_cart
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  
+  <insert id="insertShoppingcart">
+   <selectKey keyProperty="po.id" resultType="java.lang.Long" order="BEFORE">
+            select uuid_short()
+    </selectKey>
+    insert into user_shopping_cart (<include refid="Base_Column_List" />)
+    values (
+    #{po.id,jdbcType=BIGINT}, 
+    #{po.userId,jdbcType=BIGINT}, 
+    #{po.productId,jdbcType=BIGINT}, 
+    #{po.productSkuId,jdbcType=BIGINT}, 
+    #{po.count,jdbcType=INTEGER}, 
+    #{po.createUserId,jdbcType=BIGINT}, 
+    now(), 
+    #{po.lastUpdateUserId,jdbcType=BIGINT}, 
+    now()
+      )
+  </insert>
+
+
+  <update id="updateShoppingcart" >
+    update user_shopping_cart
+    <set>
+      <if test="po.userId != null">
+        user_id = #{po.userId,jdbcType=BIGINT},
+      </if>
+      <if test="po.productId != null">
+        product_id = #{po.productId,jdbcType=BIGINT},
+      </if>
+      <if test="po.productSkuId != null">
+        product_sku_id = #{po.productSkuId,jdbcType=BIGINT},
+      </if>
+      <if test="po.count != null">
+        count = #{po.count,jdbcType=INTEGER},
+      </if>
+      <if test="po.createUserId != null">
+        create_user_id = #{po.createUserId,jdbcType=BIGINT},
+      </if>
+      <if test="po.createTime != null">
+        create_time = #{po.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="po.lastUpdateUserId != null">
+        last_update_user__id = #{po.lastUpdateUserId,jdbcType=BIGINT},
+      </if>
+      <if test="po.lastUpdateTime != null">
+        last_update_time = #{po.lastUpdateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{po.id,jdbcType=BIGINT}
+  </update>
+  
+  <select id="listUserShoppingcart"  resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from user_shopping_cart
+     <where>
+       <if test="query.userId != null and query.userId != ''" > and user_id=#{query.userId }</if>
+    </where>
+  </select>
+</mapper>

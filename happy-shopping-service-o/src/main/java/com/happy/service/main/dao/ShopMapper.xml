@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.happy.service.main.dao.ShopMapper">
+  <resultMap id="BaseResultMap" type="com.happy.service.main.po.Shop">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="keeper_id" jdbcType="BIGINT" property="keeperId" />
+    <result column="address" jdbcType="VARCHAR" property="address" />
+    <result column="longitude" jdbcType="VARCHAR" property="longitude" />
+    <result column="latitude" jdbcType="VARCHAR" property="latitude" />
+    <result column="state" jdbcType="INTEGER" property="state" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="create_user_id" jdbcType="BIGINT" property="createUserId" />
+    <result column="last_update_time" jdbcType="TIMESTAMP" property="lastUpdateTime" />
+    <result column="last_update_user_id" jdbcType="BIGINT" property="lastUpdateUserId" />
+    <result column="keeper_name" jdbcType="VARCHAR" property="keeperName" />
+    <result column="mobile" jdbcType="VARCHAR" property="mobile" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, name, keeper_id, address, longitude, latitude, state, create_time, create_user_id, 
+    last_update_time, last_update_user_id,keeper_name,mobile
+  </sql>
+  <insert id="insertShop" parameterType="com.happy.service.main.po.Shop">
+  <selectKey keyProperty="po.id" resultType="java.lang.Long" order="BEFORE">
+            select uuid_short()
+    </selectKey>
+    insert into shop ( <include refid="Base_Column_List" />)
+    values (
+      #{po.id,jdbcType=BIGINT}, 
+      #{po.name,jdbcType=VARCHAR}, 
+      #{po.keeperId,jdbcType=BIGINT}, 
+      #{po.address,jdbcType=VARCHAR}, 
+      #{po.longitude,jdbcType=VARCHAR}, 
+      #{po.latitude,jdbcType=VARCHAR}, 
+      #{po.state,jdbcType=INTEGER}, 
+      now(), 
+      #{po.createUserId,jdbcType=TIMESTAMP}, 
+      now(),
+      #{po.lastUpdateUserId,jdbcType=TIMESTAMP},
+      #{po.keeperName,jdbcType=VARCHAR}, 
+      #{po.mobile,jdbcType=VARCHAR}
+      )
+  </insert>
+
+  <update id="updateShop">
+    update shop
+    <set>
+      <if test="po.name != null">
+        name = #{po.name,jdbcType=VARCHAR},
+      </if>
+      <if test="po.keeperId != null">
+        keeper_id = #{po.keeperId,jdbcType=BIGINT},
+      </if>
+      <if test="po.address != null">
+        address = #{po.address,jdbcType=VARCHAR},
+      </if>
+      <if test="po.longitude != null">
+        longitude = #{po.longitude,jdbcType=VARCHAR},
+      </if>
+      <if test="po.latitude != null">
+        latitude = #{po.latitude,jdbcType=VARCHAR},
+      </if>
+      <if test="po.state != null">
+        state = #{po.state,jdbcType=INTEGER},
+      </if>
+      <if test="po.lastUpdateTime != null">
+        last_update_time = #{po.lastUpdateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="po.lastUpdateUserId != null">
+        last_update_user_id = #{po.lastUpdateUserId,jdbcType=BIGINT},
+      </if>
+    </set>
+    where id = #{po.id,jdbcType=BIGINT}
+  </update>
+  <update id="startShop">
+    update shop
+    set 
+      state = 0,
+      last_update_time = now(),
+      last_update_user_id = #{opUserId,jdbcType=BIGINT}
+    where id = #{shopId,jdbcType=BIGINT}
+  </update>
+  <update id="stopShop">
+    update shop
+    set 
+      state = 1,
+      last_update_time = now(),
+      last_update_user_id = #{opUserId,jdbcType=BIGINT}
+    where id = #{shopId,jdbcType=BIGINT}
+  </update>
+  <select id="getShopById" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from shop
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  
+  <select id="listShop" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from shop
+     <where>
+       <if test="query.name != null and query.name != ''" > and name=#{query.name }</if>
+       <if test="query.keeperName != null and query.keeperName != ''" > and keeper_name like concat('%',#{query.keeperName},'%')</if>
+       <if test="query.mobile != null and query.mobile != ''" > and mobile like concat('%',#{query.mobile},'%')</if>
+       <if test="query.state != null and query.state != ''" > and state=#{query.state }</if>
+    </where>
+  </select>
+</mapper>

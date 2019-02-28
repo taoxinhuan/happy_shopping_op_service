@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.happy.service.main.dao.DictionaryMapper">
+  <resultMap id="BaseResultMap" type="com.happy.service.main.po.Dictionary">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="code" jdbcType="VARCHAR" property="code" />
+    <result column="sequence" jdbcType="VARCHAR" property="sequence" />
+    <result column="create_user_id" jdbcType="BIGINT" property="createUserId" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="last_update_user_id" jdbcType="BIGINT" property="lastUpdateUserId" />
+    <result column="last_update_time" jdbcType="TIMESTAMP" property="lastUpdateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, name,code, sequence, create_user_id, create_time, last_update_user_id, last_update_time
+  </sql>
+ 
+  <delete id="deleteDictionary" parameterType="java.lang.Long">
+    delete from dictionary
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insertDictionary" parameterType="com.happy.service.main.po.Dictionary">
+    <selectKey keyProperty="id" resultType="java.lang.Long" order="BEFORE">
+            select uuid_short()
+    </selectKey>
+    insert into dictionary ( <include refid="Base_Column_List" />)
+    values (#{id,jdbcType=BIGINT}, #{name,jdbcType=VARCHAR}, #{code,jdbcType=VARCHAR},  #{sequence,jdbcType=VARCHAR}, 
+      #{createUserId,jdbcType=BIGINT}, now(), #{lastUpdateUserId,jdbcType=BIGINT}, 
+      now())
+  </insert>
+  
+  <update id="updateDictionary" parameterType="com.happy.service.main.po.Dictionary">
+    update dictionary
+    <set>
+      <if test="name != null">
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="code != null">
+        code = #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="sequence != null">
+        sequence = #{sequence,jdbcType=VARCHAR},
+      </if>
+      <if test="createUserId != null">
+        create_user_id = #{createUserId,jdbcType=BIGINT},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastUpdateUserId != null">
+        last_update_user_id = #{lastUpdateUserId,jdbcType=BIGINT},
+      </if>
+      <if test="lastUpdateTime != null">
+        last_update_time = #{lastUpdateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  
+  <select id="listDictionary" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from dictionary
+    <where>
+         <if test="query.name != null and query.name != ''" > 
+         and name like concat('%',#{query.name},'%')
+         </if>
+    </where>
+   order by sequence asc
+  </select>
+  <select id="getDictionaryById" resultMap="BaseResultMap" parameterType="java.lang.Long">
+    select 
+    <include refid="Base_Column_List" />
+    from dictionary
+   where id=#{id}
+  </select>
+  <select id="getDictionaryByCode" resultMap="BaseResultMap" parameterType="java.lang.String">
+    select 
+    <include refid="Base_Column_List" />
+    from dictionary
+   where code=#{code}
+  </select>
+
+</mapper>

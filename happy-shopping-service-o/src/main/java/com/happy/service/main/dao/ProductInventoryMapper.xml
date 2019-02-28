@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.happy.service.main.dao.ProductInventoryMapper">
+  <resultMap id="BaseResultMap" type="com.happy.service.main.po.ProductInventory">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="shop_id" jdbcType="BIGINT" property="shopId" />
+    <result column="product_id" jdbcType="BIGINT" property="productId" />
+    <result column="count" jdbcType="INTEGER" property="count" />
+    <result column="create_user_id" jdbcType="BIGINT" property="createUserId" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="last_update_user_id" jdbcType="BIGINT" property="lastUpdateUserId" />
+    <result column="last_update_time" jdbcType="TIMESTAMP" property="lastUpdateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, shop_id, product_id,  count, create_user_id, create_time, last_update_user_id, 
+    last_update_time
+  </sql>
+  
+  <select id="getByProductInventoryId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from product_inventory
+    where product_id = #{productId,jdbcType=BIGINT}
+  </select>
+  
+  <insert id="insertProductInventory">
+    insert into product_inventory ( <include refid="Base_Column_List" />)
+    values (
+       #{po.id,jdbcType=BIGINT}, 
+       #{po.shopId,jdbcType=BIGINT}, 
+       #{po.productId,jdbcType=BIGINT}, 
+       #{po.count,jdbcType=INTEGER}, 
+       #{po.createUserId,jdbcType=BIGINT}, 
+       now(), 
+       #{po.lastUpdateUserId,jdbcType=BIGINT}, 
+       now()
+      )
+  </insert>
+  
+  <update id="updateProductInventory">
+    update product_inventory
+    <set>
+      <if test="po.shopId != null">
+        shop_id = #{po.shopId,jdbcType=BIGINT},
+      </if>
+      <if test="po.productId != null">
+        product_id = #{po.productId,jdbcType=BIGINT},
+      </if>
+      <if test="po.count != null">
+        count = #{po.count,jdbcType=INTEGER},
+      </if>
+      <if test="po.createUserId != null">
+        create_user_id = #{po.createUserId,jdbcType=BIGINT},
+      </if>
+      <if test="po.createTime != null">
+        create_time = #{po.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="po.lastUpdateUserId != null">
+        last_update_user_id = #{po.lastUpdateUserId,jdbcType=BIGINT},
+      </if>
+      <if test="po.lastUpdateTime != null">
+        last_update_time = #{po.lastUpdateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{po.id,jdbcType=BIGINT}
+  </update>
+ 
+</mapper>

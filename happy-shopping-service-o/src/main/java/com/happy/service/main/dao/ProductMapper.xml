@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.happy.service.main.dao.ProductMapper">
+  <resultMap id="BaseResultMap" type="com.happy.service.main.po.Product">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="shop_id" jdbcType="BIGINT" property="shopId" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="product_type" jdbcType="INTEGER" property="productType" />
+    <result column="state" jdbcType="INTEGER" property="state" />
+    <result column="imgURl" jdbcType="VARCHAR" property="imgurl" />
+    <result column="create_user_id" jdbcType="BIGINT" property="createUserId" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="last_update_user_id" jdbcType="BIGINT" property="lastUpdateUserId" />
+    <result column="last_update_time" jdbcType="TIMESTAMP" property="lastUpdateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, shop_id, name, product_type,state, imgURl, create_user_id, create_time, last_update_user_id, 
+    last_update_time
+  </sql>
+  <insert id="insertProduct">
+    insert into product ( <include refid="Base_Column_List" />)
+    values (
+      #{po.id,jdbcType=BIGINT}, 
+      #{po.shopId,jdbcType=BIGINT}, 
+      #{po.name,jdbcType=VARCHAR}, 
+      #{po.productType,jdbcType=INTEGER}, 
+      #{po.imgurl,jdbcType=VARCHAR}, 
+      #{po.createUserId,jdbcType=BIGINT}, 
+      now(), 
+      #{po.lastUpdateUserId,jdbcType=BIGINT}, 
+      now()
+      )
+  </insert>
+  <delete id="deleteProduct" parameterType="java.lang.Long">
+    delete from product
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <update id="updateProduct">
+    update product
+    <set>
+      <if test="po.shopId != null">
+        shop_id = #{po.shopId,jdbcType=BIGINT},
+      </if>
+      <if test="po.name != null">
+        name = #{po.name,jdbcType=VARCHAR},
+      </if>
+      <if test="po.productType != null">
+        product_type = #{po.productType,jdbcType=INTEGER},
+      </if>
+      <if test="po.state != null">
+        state = #{po.state,jdbcType=INTEGER},
+      </if>
+      <if test="po.imgurl != null">
+        imgURl = #{po.imgurl,jdbcType=VARCHAR},
+      </if>
+      <if test="po.createUserId != null">
+        create_user_id = #{po.createUserId,jdbcType=BIGINT},
+      </if>
+      <if test="po.createTime != null">
+        create_time = #{po.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="po.lastUpdateUserId != null">
+        last_update_user_id = #{po.lastUpdateUserId,jdbcType=BIGINT},
+      </if>
+      <if test="po.lastUpdateTime != null">
+        last_update_time = #{po.lastUpdateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{po.id,jdbcType=BIGINT}
+  </update>
+  <select id="listProduct"  resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from product
+    <where>
+       <if test="query.shopId != null and query.shopId != ''" > and shop_id=#{query.shopId }</if>
+       <if test="query.name != null and query.name != ''" > and name=#{query.name }</if>
+       <if test="query.productType != null and query.productType != ''" > and product_type=#{query.productType }</if>
+       <if test="query.state != null and query.state != ''" > and state=#{query.state }</if>
+    </where>
+  </select>
+  <select id="getByProductId" parameterType="java.lang.Long"  resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from product
+    where id=#{id}
+  </select>
+  
+
+ 
+</mapper>

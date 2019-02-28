@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.happy.service.main.dao.ProductSkuMapper">
+  <resultMap id="BaseResultMap" type="com.happy.service.main.po.ProductSku">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="shop_id" jdbcType="BIGINT" property="shopId" />
+    <result column="product_id" jdbcType="INTEGER" property="productId" />
+    <result column="sku_name" jdbcType="VARCHAR" property="skuName" />
+    <result column="sku_spec" jdbcType="VARCHAR" property="skuSpec" />
+    <result column="sku_count" jdbcType="VARCHAR" property="skuCount" />
+    <result column="sku_price" jdbcType="DECIMAL" property="skuPrice" />
+    <result column="state" jdbcType="INTEGER" property="state" />
+    <result column="create_user_id" jdbcType="BIGINT" property="createUserId" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="last_update_user_id" jdbcType="BIGINT" property="lastUpdateUserId" />
+    <result column="last_update_time" jdbcType="TIMESTAMP" property="lastUpdateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, shop_id, product_id, sku_name, sku_spec, sku_count, sku_price, state, create_user_id, 
+    create_time, last_update_user_id, last_update_time
+  </sql>
+  <insert id="insertProductSku" >
+    <selectKey keyProperty="po.id" resultType="java.lang.Long" order="BEFORE">
+            select uuid_short()
+    </selectKey>
+    insert into product_sku ( <include refid="Base_Column_List" />)
+    values (
+    #{po.id,jdbcType=BIGINT}, 
+    #{po.shopId,jdbcType=BIGINT}, 
+    #{po.productId,jdbcType=INTEGER}, 
+    #{po.skuName,jdbcType=VARCHAR}, 
+    #{po.skuSpec,jdbcType=VARCHAR}, 
+    #{po.skuCount,jdbcType=VARCHAR}, 
+    #{po.skuPrice,jdbcType=DECIMAL}, 
+    #{po.state,jdbcType=INTEGER}, 
+    #{po.createUserId,jdbcType=BIGINT}, 
+    now(), 
+    #{po.lastUpdateUserId,jdbcType=BIGINT}, 
+    now()
+      )
+  </insert>
+  
+  <select id="listProductSku" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from product_sku
+     <where>
+       <if test="query.productId != null and query.productId != ''" > and product_id=#{query.productId}</if>
+    </where>
+  </select>
+ 
+  <update id="updateProductSku" >
+    update product_sku
+    <set>
+      <if test="po.shopId != null">
+        shop_id = #{po.shopId,jdbcType=BIGINT},
+      </if>
+      <if test="po.productId != null">
+        product_id = #{po.productId,jdbcType=INTEGER},
+      </if>
+      <if test="po.skuName != null">
+        sku_name = #{po.skuName,jdbcType=VARCHAR},
+      </if>
+      <if test="po.skuSpec != null">
+        sku_spec = #{po.skuSpec,jdbcType=VARCHAR},
+      </if>
+      <if test="po.skuCount != null">
+        sku_count = #{po.skuCount,jdbcType=VARCHAR},
+      </if>
+      <if test="po.skuPrice != null">
+        sku_price = #{po.skuPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="po.state != null">
+        state = #{po.state,jdbcType=INTEGER},
+      </if>
+      <if test="po.createUserId != null">
+        create_user_id = #{po.createUserId,jdbcType=BIGINT},
+      </if>
+      <if test="po.createTime != null">
+        create_time = #{po.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="po.lastUpdateUserId != null">
+        last_update_user_id = #{po.lastUpdateUserId,jdbcType=BIGINT},
+      </if>
+      <if test="po.lastUpdateTime != null">
+        last_update_time = #{po.lastUpdateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{po.id,jdbcType=BIGINT}
+  </update>
+  <update id="startProductSku" >
+    update product_sku
+    set 
+      state = 0,
+      last_update_user_id = #{opUserId,jdbcType=BIGINT},
+      last_update_time = now()
+    where id = #{skuId,jdbcType=BIGINT}
+  </update>
+  <update id="stopProductSku" >
+    update product_sku
+    set 
+      state = 1,
+      last_update_user_id = #{opUserId,jdbcType=BIGINT},
+      last_update_time = now()
+    where id = #{skuId,jdbcType=BIGINT}
+  </update>
+</mapper>

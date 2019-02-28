@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.happy.service.main.dao.MenuMapper">
+  <resultMap id="BaseResultMap" type="com.happy.service.main.po.Menu">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="privilege_type" jdbcType="VARCHAR" property="privilegeType" />
+    <result column="privilege_name" jdbcType="VARCHAR" property="privilegeName" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="url" jdbcType="VARCHAR" property="url" />
+    <result column="icon" jdbcType="VARCHAR" property="icon" />
+    <result column="parent_id" jdbcType="INTEGER" property="parentId" />
+    <result column="sequence" jdbcType="VARCHAR" property="sequence" />
+    <result column="create_user_id" jdbcType="BIGINT" property="createUserId" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="last_update_user_id" jdbcType="BIGINT" property="lastUpdateUserId" />
+    <result column="last_update_time" jdbcType="TIMESTAMP" property="lastUpdateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, privilege_type, privilege_name, title, url, icon, parent_id, sequence, create_user_id, 
+    create_time, last_update_user_id, last_update_time
+  </sql>
+  <select id="listMenu" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from menu
+    where parent_id is null order by sequence 
+  </select>
+  
+  <select id="listSonMenu" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from menu
+    where parent_id =#{parentId}
+    order by sequence 
+  </select>
+  
+    <select id="getById" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from menu
+    where id =#{id}
+  </select>
+  
+   <insert id="insertMenu">
+    <selectKey keyProperty="po.id" resultType="java.lang.Long" order="BEFORE">
+            select uuid_short()
+    </selectKey>
+    insert into menu ( <include refid="Base_Column_List" />)
+    values (
+      #{po.id,jdbcType=BIGINT}, 
+      #{po.privilegeType,jdbcType=VARCHAR}, 
+      #{po.privilegeName,jdbcType=VARCHAR}, 
+      #{po.title,jdbcType=VARCHAR}, 
+      #{po.url,jdbcType=VARCHAR}, 
+      #{po.icon,jdbcType=VARCHAR}, 
+      #{po.parentId,jdbcType=BIGINT}, 
+      #{po.sequence,jdbcType=VARCHAR}, 
+      #{po.createUserId,jdbcType=BIGINT}, 
+      now(), 
+      #{po.lastUpdateUserId,jdbcType=BIGINT}, 
+      now()
+      )
+  </insert>
+  <delete id="deleteMenu" parameterType="java.lang.Long">
+    delete from menu
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <update id="updateMenu">
+    update menu
+    <set>
+      <if test="po.privilegeName != null">
+        privilege_name = #{po.privilegeName,jdbcType=VARCHAR},
+      </if>
+      <if test="po.title != null">
+        title = #{po.title,jdbcType=VARCHAR},
+      </if>
+      <if test="po.url != null">
+        url = #{po.url,jdbcType=VARCHAR},
+      </if>
+      <if test="po.icon != null">
+        icon = #{po.icon,jdbcType=VARCHAR},
+      </if>
+      <if test="po.sequence != null">
+        sequence = #{po.sequence,jdbcType=VARCHAR},
+      </if>
+      <if test="po.lastUpdateUserId != null">
+        last_update_user_id = #{po.lastUpdateUserId,jdbcType=BIGINT},
+      </if>
+      <if test="po.lastUpdateTime != null">
+        last_update_time = #{po.lastUpdateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{po.id,jdbcType=BIGINT}
+  </update>
+  
+</mapper>
